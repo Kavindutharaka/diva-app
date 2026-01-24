@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1080, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Weekend Fitness Challenge</title>
+  <title>App</title>
   <link rel="icon" type="image/x-icon" href="ico.ico">
 
   <script src="./sup/angular.min.js"></script>
@@ -15,6 +15,17 @@
   <style>
     input:focus {
       outline: none;
+    }
+
+    @font-face {
+      font-family: "AvantGardeBold";
+      src: url("./font/ITC Avant Garde Gothic LT Bold.otf") format("opentype");
+      font-weight: bold;
+      font-style: normal;
+    }
+
+    body {
+      font-family: "AvantGardeBold", sans-serif;
     }
   </style>
 </head>
@@ -35,13 +46,49 @@
         <span style="font-size: 80px; color: white;">NAME</span>
         <input class="focus:outline-none border-none "
           style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 30px;" type="text" />
-        <span style="font-size: 80px; color: white;">TP</span>
+        <span style="font-size: 80px; color: white;">Mobile No.</span>
         <input class="focus:outline-none border-none "
           style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 30px;" type="text" />
       </div>
-      <button style="font-size: 60px; background-color: white; color: palevioletred; padding: 20px 70px; border: none; margin-top: 180px;">Start</button>
+      <button
+        style="font-size: 60px; background-color: white; color: palevioletred; padding: 20px 70px; border: none; margin-top: 180px; border-radius: 30px;">Start</button>
     </div>
   </section>
+
+  <section ng-show="page == 3">
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 150px;">
+      <img style="width: 400px;" src="./img/Asset 2.png" />
+      <img style="margin: 80px 0;" src="./img/Asset 11.png" />
+      <div style="display: flex; justify-content: space-between; width: 98%; margin-top: 166px;">
+        <img src="./img/Asset 12.png" />
+        <img src="./img/Asset 13.png" />
+      </div>
+      <div>
+        <img style="position: absolute; left: 50%; transform: translateX(-50%); top: 50%; width: 550px;" src="./Razor/1 Harsh, clinical copy.png" />
+      </div>
+    </div>
+  </section>
+
+  <section ng-show="page == 4">
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 120px;">
+      <img style="width: 400px;" src="./img/Asset 2.png" />
+      <img style="margin-top: -45px;" src="./img/Asset 14.png" />
+      <img style="width: 80%; margin-top: -38px;" src="./img/Asset 17.png" />
+      <img style="margin-top: 15px;" src="./img/Asset 15.png" />
+
+    </div>
+  </section>
+
+  <section ng-show="page == 5">
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 120px;">
+      <img style="width: 400px; margin-bottom: 50px;" src="./img/Asset 2.png" />
+      <img src="./img/Asset 16.png" />
+      <img style="width: 80%; margin-top: 90px;" src="./img/Asset 17.png" />
+      <img style="margin-top: 15px;" src="./img/Asset 15.png" />
+
+    </div>
+  </section>
+
 
 </body>
 
