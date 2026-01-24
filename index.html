@@ -2,35 +2,43 @@
 <html lang="en" ng-app="FitnessApp" ng-cloak>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=1080, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Weekend Fitness Challenge</title>
-    <link rel="icon" type="image/x-icon" href="ico.ico">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Weekend Fitness Challenge</title>
+  <link rel="icon" type="image/x-icon" href="ico.ico">
 
-    <script src="./sup/angular.min.js"></script>
-    <script src="./app.js"></script>
+  <script src="./sup/angular.min.js"></script>
+  <script src="./app.js"></script>
 
-    <link rel="stylesheet" href="./sup/styles.css">
+  <link rel="stylesheet" href="./sup/styles.css">
+
+  <style>
+    input:focus {
+      outline: none;
+    }
+  </style>
 </head>
 
 <body ng-controller="MainCtrl" style="background: url(./img/Artboard\ 1.png);">
 
   <section ng-show="page == 1">
     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 280px;">
-        <img style="width: 400px;" src="./img/Asset 2.png" />
-        <img ng-click="pg_up()" style="margin-top: 450px;" src="./img/Asset 10.png">
+      <img style="width: 400px;" src="./img/Asset 2.png" />
+      <img ng-click="pg_up()" style="margin-top: 450px;" src="./img/Asset 10.png">
     </div>
   </section>
 
   <section ng-show="page == 2">
-     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 80px;">
-        <img style="width: 400px;" src="./img/Asset 2.png" />
-        <div>
-            <span style="">NAME</span>
-            <input type="text" />
-            <span style="">TP</span>
-            <input type="text" />
-        </div>
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 80px;">
+      <img style="width: 400px;" src="./img/Asset 2.png" />
+      <div style="display: flex; flex-direction: column; text-align: center;  gap: 40px; margin-top: 100px;">
+        <span style="font-size: 80px; color: white;">NAME</span>
+        <input class="focus:outline-none border-none "
+          style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 30px;" type="text" />
+        <span style="font-size: 80px; color: white;">TP</span>
+        <input class="focus:outline-none border-none "
+          style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 30px;" type="text" />
+      </div>
     </div>
   </section>
 
