@@ -1,12 +1,228 @@
 var app = angular.module('FitnessApp', []);
 
-app.controller('MainCtrl', function ($scope, $interval, $timeout, $http) {
+app.controller('MainCtrl', function ($scope, $interval, $timeout) {
     console.log("App Started!");
 
-    $scope.page = 5;
+    $scope.page = 1;
 
-    $scope.pg_up = function(){
-        $scope.page ++;
+    // Swipe game state
+    $scope.timer = 60;
+    $scope.score = 0;
+    $scope.currentCardIndex = 0;
+    $scope.cards = [];
+    $scope.currentCard = null;
+    var timerInterval = null;
+    var isDragging = false;
+    var startX = 0;
+    var currentX = 0;
+
+    // All available card images
+    var razorCards = [
+        { image: './Razor/1 Harsh, clinical copy.png', type: 'razor' },
+        { image: './Razor/2 Razor Cuts copy.png', type: 'razor' },
+        { image: './Razor/3 Cuts hair copy.png', type: 'razor' },
+        { image: './Razor/4 Frustration, copy.png', type: 'razor' },
+        { image: './Razor/5 Dryness copy.png', type: 'razor' },
+        { image: './Razor/6 Hair grows back copy.png', type: 'razor' },
+        { image: './Razor/7 Risky for copy.png', type: 'razor' },
+        { image: './Razor/8 Prickly regrowth copy.png', type: 'razor' },
+        { image: './Razor/9 Nicks, cuts, irritation, copy.png', type: 'razor' },
+        { image: './Razor/10 Under arm darkening copy.png', type: 'razor' }
+    ];
+
+    var veetCards = [
+        { image: './Veet/10 Smooth Skin copy.png', type: 'veet' },
+        { image: './Veet/2 dermatologically tested copy.png', type: 'veet' },
+        { image: './Veet/3 28 Days copy.png', type: 'veet' },
+        { image: './Veet/4 Cuts hair copy.png', type: 'veet' },
+        { image: './Veet/5 Feels cool, copy.png', type: 'veet' },
+        { image: './Veet/7 Hydrates, copy.png', type: 'veet' },
+        { image: './Veet/9 Safe and suitable for copy.png', type: 'veet' }
+    ];
+
+    // Shuffle array helper
+    function shuffle(array) {
+        var shuffled = array.slice();
+        for (var i = shuffled.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = shuffled[i];
+            shuffled[i] = shuffled[j];
+            shuffled[j] = temp;
+        }
+        return shuffled;
+    }
+
+    // Pick 5 random from each category and combine
+    function generateDeck() {
+        var shuffledRazor = shuffle(razorCards);
+        var shuffledVeet = shuffle(veetCards);
+        var picked = shuffledRazor.slice(0, 5).concat(shuffledVeet.slice(0, 5));
+        return shuffle(picked);
+    }
+
+    // Start the game
+    $scope.startGame = function () {
+        $scope.page = 3;
+        $scope.timer = 60;
+        $scope.score = 0;
+        $scope.currentCardIndex = 0;
+        $scope.cards = generateDeck();
+        $scope.currentCard = $scope.cards[0];
+
+        // Start countdown timer
+        if (timerInterval) $interval.cancel(timerInterval);
+        timerInterval = $interval(function () {
+            $scope.timer--;
+            if ($scope.timer <= 0) {
+                $interval.cancel(timerInterval);
+                timerInterval = null;
+                endGame();
+            }
+        }, 1000);
+
+        // Setup touch/mouse events after DOM renders
+        $timeout(function () {
+            setupSwipeEvents();
+        }, 100);
     };
-   
+
+    function endGame() {
+        if (timerInterval) {
+            $interval.cancel(timerInterval);
+            timerInterval = null;
+        }
+        if ($scope.score >= 8) {
+            $scope.page = 4; // Win
+        } else {
+            $scope.page = 5; // Lose
+        }
+    }
+
+    // Swipe card programmatically (from button clicks)
+    $scope.swipeCard = function (direction) {
+        if (!$scope.currentCard) return;
+        animateSwipe(direction);
+    };
+
+    function animateSwipe(direction) {
+        var card = document.getElementById('swipe-card');
+        if (!card) return;
+
+        card.classList.add('animating');
+        if (direction === 'left') {
+            card.classList.add('swipe-left');
+        } else {
+            card.classList.add('swipe-right');
+        }
+
+        // Check if correct
+        var isCorrect = false;
+        if (direction === 'left' && $scope.currentCard.type === 'razor') {
+            isCorrect = true;
+        } else if (direction === 'right' && $scope.currentCard.type === 'veet') {
+            isCorrect = true;
+        }
+
+        if (isCorrect) {
+            $scope.score++;
+        }
+
+        // Wait for animation to complete, then show next card
+        $timeout(function () {
+            $scope.currentCardIndex++;
+            if ($scope.currentCardIndex < $scope.cards.length) {
+                $scope.currentCard = $scope.cards[$scope.currentCardIndex];
+                $timeout(function () {
+                    setupSwipeEvents();
+                }, 50);
+            } else {
+                $scope.currentCard = null;
+                endGame();
+            }
+        }, 400);
+    }
+
+    // Setup touch and mouse drag events
+    function setupSwipeEvents() {
+        var card = document.getElementById('swipe-card');
+        if (!card) return;
+
+        // Reset classes
+        card.classList.remove('animating', 'swipe-left', 'swipe-right');
+        card.style.transform = 'translateX(-50%)';
+        card.style.opacity = '1';
+
+        // Touch events
+        card.ontouchstart = function (e) {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            card.style.transition = 'none';
+        };
+
+        card.ontouchmove = function (e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            currentX = e.touches[0].clientX;
+            var deltaX = currentX - startX;
+            var rotation = deltaX * 0.1;
+            card.style.transform = 'translateX(calc(-50% + ' + deltaX + 'px)) rotate(' + rotation + 'deg)';
+            card.style.opacity = Math.max(0.5, 1 - Math.abs(deltaX) / 500);
+        };
+
+        card.ontouchend = function (e) {
+            if (!isDragging) return;
+            isDragging = false;
+            var deltaX = currentX - startX;
+            if (Math.abs(deltaX) > 100) {
+                var direction = deltaX < 0 ? 'left' : 'right';
+                $scope.$apply(function () {
+                    animateSwipe(direction);
+                });
+            } else {
+                // Snap back
+                card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                card.style.transform = 'translateX(-50%)';
+                card.style.opacity = '1';
+            }
+        };
+
+        // Mouse events for desktop
+        card.onmousedown = function (e) {
+            isDragging = true;
+            startX = e.clientX;
+            currentX = e.clientX;
+            card.style.transition = 'none';
+            e.preventDefault();
+        };
+
+        document.onmousemove = function (e) {
+            if (!isDragging) return;
+            currentX = e.clientX;
+            var deltaX = currentX - startX;
+            var rotation = deltaX * 0.1;
+            card.style.transform = 'translateX(calc(-50% + ' + deltaX + 'px)) rotate(' + rotation + 'deg)';
+            card.style.opacity = Math.max(0.5, 1 - Math.abs(deltaX) / 500);
+        };
+
+        document.onmouseup = function (e) {
+            if (!isDragging) return;
+            isDragging = false;
+            var deltaX = currentX - startX;
+            if (Math.abs(deltaX) > 100) {
+                var direction = deltaX < 0 ? 'left' : 'right';
+                $scope.$apply(function () {
+                    animateSwipe(direction);
+                });
+            } else {
+                // Snap back
+                card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                card.style.transform = 'translateX(-50%)';
+                card.style.opacity = '1';
+            }
+        };
+    }
+
+    $scope.pg_up = function () {
+        $scope.page++;
+    };
 });
