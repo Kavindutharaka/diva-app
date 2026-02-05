@@ -123,15 +123,24 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             isCorrect = true;
         }
 
-        var gameArea = document.querySelector('.game-area');
+        var borderEl = document.querySelector('.correct-sel-border');
         if (isCorrect) {
             $scope.score++;
-            if (gameArea) gameArea.classList.add('correct-answer');
+            if (borderEl) {
+                borderEl.classList.remove('fade-out');
+                borderEl.classList.add('correct-answer');
+            }
         }
 
         // Wait for animation to complete, then show next card
         $timeout(function () {
-            if (gameArea) gameArea.classList.remove('correct-answer');
+            if (borderEl && isCorrect) {
+                borderEl.classList.remove('correct-answer');
+                borderEl.classList.add('fade-out');
+                $timeout(function () {
+                    if (borderEl) borderEl.classList.remove('fade-out');
+                }, 500);
+            }
             $scope.currentCardIndex++;
             if ($scope.currentCardIndex < $scope.cards.length) {
                 $scope.currentCard = $scope.cards[$scope.currentCardIndex];

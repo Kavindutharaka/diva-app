@@ -42,12 +42,28 @@
       left: 46px;
       overflow: hidden;
       border-radius: 69px;
-      border: 20px solid transparent;
-      transition: border-color 0.15s ease-in, border-color 0.4s ease-out;
     }
 
-    .game-area.correct-answer {
+    .correct-sel-border {
+      width: 972px;
+      height: 1811px;
+      border: 54px solid transparent;
+      border-radius: 69px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      transition: border-color 0.15s ease-in;
+    }
+
+    .correct-sel-border.correct-answer {
       border-color: #22c55e;
+      transition: border-color 0.1s ease-in;
+    }
+
+    .correct-sel-border.fade-out {
+      border-color: transparent;
+      transition: border-color 0.5s ease-out;
     }
 
     .swipe-card {
@@ -254,7 +270,7 @@
     </div>
   </section>
 
-  <section ng-show="page == 3">
+  <section ng-show="page == 3" style="position: relative;">
     <div class="game-area">
       <div style="display: flex; flex-direction: column; align-items: center; padding-top: 120px; width: 100%;">
         <img style="width: 400px;" src="./img/Asset 2.png" />
@@ -271,6 +287,7 @@
         />
       </div>
     </div>
+    <div class="correct-sel-border"></div>
   </section>
 
   <section ng-show="page == 4">
