@@ -42,7 +42,7 @@
       left: 46px;
       overflow: hidden;
       border-radius: 69px;
-      border: 8px solid transparent;
+      border: 20px solid transparent;
       transition: border-color 0.15s ease-in, border-color 0.4s ease-out;
     }
 
@@ -108,15 +108,133 @@
       text-align: center;
       margin-top: 10px;
     }
+
+    /* Page 1 sparkle overlay */
+    .sparkle-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 1920px;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      animation: sparkle 2.5s ease-in-out infinite;
+    }
+
+    .sparkle::before,
+    .sparkle::after {
+      content: '';
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .sparkle::before {
+      width: 100%;
+      height: 3px;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+    }
+
+    .sparkle::after {
+      width: 3px;
+      height: 100%;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+      50% { opacity: 1; transform: scale(1) rotate(180deg); }
+    }
+
+    .sparkle:nth-child(1) { top: 12%; left: 15%; animation-delay: 0s; width: 14px; height: 14px; }
+    .sparkle:nth-child(2) { top: 30%; left: 80%; animation-delay: 0.4s; width: 10px; height: 10px; }
+    .sparkle:nth-child(3) { top: 55%; left: 25%; animation-delay: 0.8s; width: 16px; height: 16px; }
+    .sparkle:nth-child(4) { top: 70%; left: 70%; animation-delay: 1.2s; width: 11px; height: 11px; }
+    .sparkle:nth-child(5) { top: 20%; left: 50%; animation-delay: 1.6s; width: 13px; height: 13px; }
+    .sparkle:nth-child(6) { top: 85%; left: 40%; animation-delay: 0.3s; width: 9px; height: 9px; }
+    .sparkle:nth-child(7) { top: 45%; left: 90%; animation-delay: 1.0s; width: 15px; height: 15px; }
+    .sparkle:nth-child(8) { top: 65%; left: 10%; animation-delay: 1.8s; width: 12px; height: 12px; }
+    .sparkle:nth-child(9) { top: 8%; left: 65%; animation-delay: 0.6s; width: 10px; height: 10px; }
+    .sparkle:nth-child(10) { top: 40%; left: 55%; animation-delay: 2.0s; width: 14px; height: 14px; }
+    .sparkle:nth-child(11) { top: 90%; left: 85%; animation-delay: 1.4s; width: 11px; height: 11px; }
+    .sparkle:nth-child(12) { top: 75%; left: 35%; animation-delay: 0.2s; width: 13px; height: 13px; }
+
+    /* Glass shine sweep */
+    .shine-overlay {
+      position: absolute;
+      top: 0;
+      left: -60%;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.05) 30%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.05) 70%,
+        transparent 100%
+      );
+      animation: shine-sweep 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shine-sweep {
+      0% { left: -60%; }
+      50% { left: 120%; }
+      100% { left: 120%; }
+    }
+
+    /* Button shake */
+    .shake-btn {
+      animation: shake 2.5s ease-in-out infinite;
+      cursor: pointer;
+    }
+
+    @keyframes shake {
+      0%, 70%, 100% { transform: translateX(0); }
+      75% { transform: translateX(-12px) rotate(-3deg); }
+      80% { transform: translateX(10px) rotate(2deg); }
+      85% { transform: translateX(-8px) rotate(-2deg); }
+      90% { transform: translateX(6px) rotate(1deg); }
+      95% { transform: translateX(-3px); }
+    }
   </style>
 </head>
 
 <body ng-controller="MainCtrl" style="background: url(./img/Artboard\ 1.png);">
 
-  <section ng-show="page == 1">
+  <section ng-show="page == 1" style="position: relative;">
+    <div class="sparkle-container">
+      <div class="shine-overlay"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+    </div>
     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 280px;">
       <img style="width: 400px;" src="./img/Asset 2.png" />
-      <img ng-click="pg_up()" style="margin-top: 450px;" src="./img/Asset 10.png">
+      <img ng-click="pg_up()" class="shake-btn" style="margin-top: 450px;" src="./img/Asset 10.png">
     </div>
   </section>
 
