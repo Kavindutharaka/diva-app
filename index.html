@@ -28,11 +28,20 @@
       font-family: "AvantGardeBold", sans-serif;
     }
 
+    .game-area {
+      position: relative;
+      margin: 25px 35px 55px 35px;
+      width: 1010px;
+      height: 1840px;
+      overflow: hidden;
+      border-radius: 35px;
+    }
+
     .swipe-card {
       position: absolute;
       left: 50%;
       top: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       width: 550px;
       cursor: grab;
       transition: none;
@@ -42,16 +51,16 @@
     }
 
     .swipe-card.animating {
-      transition: transform 0.4s ease, opacity 0.4s ease;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .swipe-card.swipe-left {
-      transform: translateX(-150%) rotate(-30deg);
+      transform: translate(-50%, -50%) translateX(-350px) rotate(-12deg) scale(0.75);
       opacity: 0;
     }
 
     .swipe-card.swipe-right {
-      transform: translateX(50%) rotate(30deg);
+      transform: translate(-50%, -50%) translateX(350px) rotate(12deg) scale(0.75);
       opacity: 0;
     }
 
@@ -59,13 +68,14 @@
       font-size: 70px;
       color: white;
       text-align: center;
-      margin-bottom: 10px;
+      margin-top: 20px;
     }
 
     .score-display {
       font-size: 40px;
       color: white;
       text-align: center;
+      margin-top: 5px;
     }
   </style>
 </head>
@@ -96,12 +106,13 @@
   </section>
 
   <section ng-show="page == 3">
-    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 150px;">
-      <img style="width: 400px;" src="./img/Asset 2.png" />
-      <div class="timer-display">{{timer}}s</div>
-      <img style="margin: 30px 0;" src="./img/Asset 11.png" />
-      <div class="score-display">{{score}} / {{currentCardIndex + (currentCardIndex < cards.length ? 1 : 0)}}</div>
-      <div style="display: flex; justify-content: space-between; width: 98%; margin-top: 166px;">
+    <div class="game-area">
+      <div style="display: flex; flex-direction: column; align-items: center; padding-top: 120px; width: 100%;">
+        <img style="width: 400px;" src="./img/Asset 2.png" />
+        <div class="timer-display">{{timer}}s</div>
+        <div class="score-display">{{score}} / {{currentCardIndex + (currentCardIndex < cards.length ? 1 : 0)}}</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; width: 100%; position: absolute; bottom: 100px; padding: 0 25px; box-sizing: border-box;">
         <img ng-click="swipeCard('left')" src="./img/Asset 12.png" style="cursor: pointer; z-index: 5;" />
         <img ng-click="swipeCard('right')" src="./img/Asset 13.png" style="cursor: pointer; z-index: 5;" />
       </div>
@@ -110,9 +121,6 @@
           id="swipe-card"
           class="swipe-card"
           ng-src="{{currentCard.image}}"
-          on-touch-start="onTouchStart($event)"
-          on-touch-move="onTouchMove($event)"
-          on-touch-end="onTouchEnd($event)"
         />
       </div>
     </div>
