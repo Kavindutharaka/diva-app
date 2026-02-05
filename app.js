@@ -123,12 +123,15 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             isCorrect = true;
         }
 
+        var gameArea = document.querySelector('.game-area');
         if (isCorrect) {
             $scope.score++;
+            if (gameArea) gameArea.classList.add('correct-answer');
         }
 
         // Wait for animation to complete, then show next card
         $timeout(function () {
+            if (gameArea) gameArea.classList.remove('correct-answer');
             $scope.currentCardIndex++;
             if ($scope.currentCardIndex < $scope.cards.length) {
                 $scope.currentCard = $scope.cards[$scope.currentCardIndex];
