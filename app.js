@@ -146,15 +146,13 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
     }
 
     // Clamp drag distance so card stays within the game area border
-    var maxDragLeft = 300;
-    var maxDragRight = 238;
+    var maxDrag = 220;
 
     function getDragTransform(deltaX) {
-        var limit = deltaX < 0 ? maxDragLeft : maxDragRight;
-        var clamped = Math.max(-maxDragLeft, Math.min(maxDragRight, deltaX));
-        var rotation = clamped * 0.04;
-        var scale = 1 - Math.abs(clamped) / limit * 0.15;
-        var opacity = 1 - Math.abs(clamped) / limit * 0.5;
+        var clamped = Math.max(-maxDrag, Math.min(maxDrag, deltaX));
+        var rotation = clamped * 0.05;
+        var scale = 1 - Math.abs(clamped) / maxDrag * 0.15;
+        var opacity = 1 - Math.abs(clamped) / maxDrag * 0.5;
         return {
             transform: 'translate(calc(-50% + ' + clamped + 'px), -50%) rotate(' + rotation + 'deg) scale(' + scale + ')',
             opacity: opacity
