@@ -40,7 +40,7 @@
     .swipe-card {
       position: absolute;
       left: 50%;
-      top: 50%;
+      top: 58%;
       transform: translate(-50%, -50%);
       width: 550px;
       cursor: grab;
@@ -64,18 +64,36 @@
       opacity: 0;
     }
 
+    .side-indicator {
+      position: absolute;
+      top: 58%;
+      transform: translateY(-50%);
+      z-index: 5;
+      cursor: pointer;
+    }
+
+    .side-indicator.left {
+      left: 15px;
+      width: 140px;
+    }
+
+    .side-indicator.right {
+      right: 15px;
+      width: 160px;
+    }
+
     .timer-display {
-      font-size: 70px;
+      font-size: 110px;
       color: white;
       text-align: center;
       margin-top: 20px;
     }
 
     .score-display {
-      font-size: 40px;
+      font-size: 50px;
       color: white;
       text-align: center;
-      margin-top: 5px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -112,10 +130,8 @@
         <div class="timer-display">{{timer}}s</div>
         <div class="score-display">{{score}} / {{currentCardIndex + (currentCardIndex < cards.length ? 1 : 0)}}</div>
       </div>
-      <div style="display: flex; justify-content: space-between; width: 100%; position: absolute; bottom: 100px; padding: 0 25px; box-sizing: border-box;">
-        <img ng-click="swipeCard('left')" src="./img/Asset 12.png" style="cursor: pointer; z-index: 5;" />
-        <img ng-click="swipeCard('right')" src="./img/Asset 13.png" style="cursor: pointer; z-index: 5;" />
-      </div>
+      <img ng-click="swipeCard('left')" src="./img/Asset 12.png" class="side-indicator left" />
+      <img ng-click="swipeCard('right')" src="./img/Asset 13.png" class="side-indicator right" />
       <div ng-if="currentCard">
         <img
           id="swipe-card"
