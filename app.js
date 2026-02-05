@@ -142,20 +142,35 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
         }, 400);
     }
 
+    // Clamp drag distance so card stays within the game area border
+    var maxDrag = 300;
+
+    function getDragTransform(deltaX) {
+        var clamped = Math.max(-maxDrag, Math.min(maxDrag, deltaX));
+        var rotation = clamped * 0.04;
+        var scale = 1 - Math.abs(clamped) / maxDrag * 0.15;
+        var opacity = 1 - Math.abs(clamped) / maxDrag * 0.5;
+        return {
+            transform: 'translate(calc(-50% + ' + clamped + 'px), -50%) rotate(' + rotation + 'deg) scale(' + scale + ')',
+            opacity: opacity
+        };
+    }
+
     // Setup touch and mouse drag events
     function setupSwipeEvents() {
         var card = document.getElementById('swipe-card');
         if (!card) return;
 
-        // Reset classes
+        // Reset classes and styles
         card.classList.remove('animating', 'swipe-left', 'swipe-right');
-        card.style.transform = 'translateX(-50%)';
+        card.style.transform = 'translate(-50%, -50%)';
         card.style.opacity = '1';
 
         // Touch events
         card.ontouchstart = function (e) {
             isDragging = true;
             startX = e.touches[0].clientX;
+            currentX = startX;
             card.style.transition = 'none';
         };
 
@@ -164,24 +179,24 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             e.preventDefault();
             currentX = e.touches[0].clientX;
             var deltaX = currentX - startX;
-            var rotation = deltaX * 0.1;
-            card.style.transform = 'translateX(calc(-50% + ' + deltaX + 'px)) rotate(' + rotation + 'deg)';
-            card.style.opacity = Math.max(0.5, 1 - Math.abs(deltaX) / 500);
+            var styles = getDragTransform(deltaX);
+            card.style.transform = styles.transform;
+            card.style.opacity = styles.opacity;
         };
 
         card.ontouchend = function (e) {
             if (!isDragging) return;
             isDragging = false;
             var deltaX = currentX - startX;
-            if (Math.abs(deltaX) > 100) {
+            if (Math.abs(deltaX) > 80) {
                 var direction = deltaX < 0 ? 'left' : 'right';
                 $scope.$apply(function () {
                     animateSwipe(direction);
                 });
             } else {
-                // Snap back
-                card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-                card.style.transform = 'translateX(-50%)';
+                // Snap back with spring feel
+                card.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease';
+                card.style.transform = 'translate(-50%, -50%)';
                 card.style.opacity = '1';
             }
         };
@@ -199,24 +214,24 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             if (!isDragging) return;
             currentX = e.clientX;
             var deltaX = currentX - startX;
-            var rotation = deltaX * 0.1;
-            card.style.transform = 'translateX(calc(-50% + ' + deltaX + 'px)) rotate(' + rotation + 'deg)';
-            card.style.opacity = Math.max(0.5, 1 - Math.abs(deltaX) / 500);
+            var styles = getDragTransform(deltaX);
+            card.style.transform = styles.transform;
+            card.style.opacity = styles.opacity;
         };
 
         document.onmouseup = function (e) {
             if (!isDragging) return;
             isDragging = false;
             var deltaX = currentX - startX;
-            if (Math.abs(deltaX) > 100) {
+            if (Math.abs(deltaX) > 80) {
                 var direction = deltaX < 0 ? 'left' : 'right';
                 $scope.$apply(function () {
                     animateSwipe(direction);
                 });
             } else {
-                // Snap back
-                card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-                card.style.transform = 'translateX(-50%)';
+                // Snap back with spring feel
+                card.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease';
+                card.style.transform = 'translate(-50%, -50%)';
                 card.style.opacity = '1';
             }
         };
