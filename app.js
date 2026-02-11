@@ -53,9 +53,10 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
     }
 
     $scope.getPercentage = function() {
-                var pct = ($scope.score / $scope.currentCardIndex) * 100;
-                return Math.min(100, Math.max(0, pct));
-            };
+        var total = $scope.cards.length || 10;
+        var pct = ($scope.score / total) * 100;
+        return Math.min(100, Math.max(0, pct));
+    };
 
     // Pick 5 random from each category and combine
     function generateDeck() {
