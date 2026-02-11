@@ -5,6 +5,35 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
 
     $scope.page = 1;
 
+    // Smooth page transition helper
+    function goToPage(newPage) {
+        var sections = document.querySelectorAll('section');
+        var currentIndex = $scope.page - 1; // pages are 1-indexed, sections 0-indexed
+        var currentSection = sections[currentIndex];
+
+        if (currentSection) {
+            currentSection.classList.add('page-exit');
+        }
+
+        $timeout(function () {
+            if (currentSection) {
+                currentSection.classList.remove('page-exit');
+            }
+            $scope.page = newPage;
+            // Add enter animation to new section after Angular digest
+            $timeout(function () {
+                var newSection = sections[newPage - 1];
+                if (newSection) {
+                    newSection.classList.add('page-enter');
+                    newSection.addEventListener('animationend', function handler() {
+                        newSection.classList.remove('page-enter');
+                        newSection.removeEventListener('animationend', handler);
+                    });
+                }
+            }, 0);
+        }, 280);
+    }
+
     // Swipe game state
     $scope.timer = 30;
     $scope.score = 0;
@@ -68,28 +97,38 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
 
     // Start the game
     $scope.startGame = function () {
-        $scope.page = 3;
         $scope.timer = 30;
         $scope.score = 0;
         $scope.currentCardIndex = 0;
         $scope.cards = generateDeck();
         $scope.currentCard = $scope.cards[0];
 
-        // Start countdown timer
-        if (timerInterval) $interval.cancel(timerInterval);
-        timerInterval = $interval(function () {
-            $scope.timer--;
-            if ($scope.timer <= 0) {
-                $interval.cancel(timerInterval);
-                timerInterval = null;
-                endGame();
-            }
-        }, 1000);
+        goToPage(3);
 
-        // Setup touch/mouse events after DOM renders
+        // Start countdown timer after page transition completes
         $timeout(function () {
+            if (timerInterval) $interval.cancel(timerInterval);
+            timerInterval = $interval(function () {
+                $scope.timer--;
+
+                // Timer urgency: pulse red in last 5 seconds
+                if ($scope.timer <= 5) {
+                    var timerEl = document.querySelector('.timer-display');
+                    if (timerEl && !timerEl.classList.contains('timer-urgent')) {
+                        timerEl.classList.add('timer-urgent');
+                    }
+                }
+
+                if ($scope.timer <= 0) {
+                    $interval.cancel(timerInterval);
+                    timerInterval = null;
+                    endGame();
+                }
+            }, 1000);
+
+            // Setup touch/mouse events after DOM renders
             setupSwipeEvents();
-        }, 100);
+        }, 350);
     };
 
     function endGame() {
@@ -98,9 +137,9 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             timerInterval = null;
         }
         if ($scope.score >= 10) {
-            $scope.page = 4; // Win
+            goToPage(4); // Win
         } else {
-            $scope.page = 5; // Lose
+            goToPage(5); // Lose
         }
     }
 
@@ -132,6 +171,13 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
         if (isCorrect) {
             $scope.score++;
             card.classList.add('correct-answer');
+            // Score pop animation
+            var scoreEl = document.querySelector('.score-display');
+            if (scoreEl) {
+                scoreEl.classList.remove('score-pop');
+                void scoreEl.offsetWidth; // force reflow to restart animation
+                scoreEl.classList.add('score-pop');
+            }
         } else {
             card.classList.add('wrong-answer');
         }
@@ -172,8 +218,17 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
 
         // Reset classes and styles
         card.classList.remove('animating', 'swipe-left', 'swipe-right', 'correct-answer', 'wrong-answer');
-        card.style.transform = 'translate(-50%, -50%)';
-        card.style.opacity = '1';
+        card.style.transform = '';
+        card.style.opacity = '';
+
+        // Card entrance animation
+        card.classList.add('card-enter');
+        card.addEventListener('animationend', function handler() {
+            card.classList.remove('card-enter');
+            card.style.transform = 'translate(-50%, -50%)';
+            card.style.opacity = '1';
+            card.removeEventListener('animationend', handler);
+        });
 
         // Touch events
         card.ontouchstart = function (e) {
@@ -247,6 +302,6 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
     }
 
     $scope.pg_up = function () {
-        $scope.page++;
+        goToPage($scope.page + 1);
     };
 });
