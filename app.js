@@ -58,11 +58,11 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
         return Math.min(100, Math.max(0, pct));
     };
 
-    // Pick 5 random from each category and combine
+    // Pick 6 random from each category and combine
     function generateDeck() {
         var shuffledRazor = shuffle(razorCards);
         var shuffledVeet = shuffle(veetCards);
-        var picked = shuffledRazor.slice(0, 5).concat(shuffledVeet.slice(0, 5));
+        var picked = shuffledRazor.slice(0, 6).concat(shuffledVeet.slice(0, 6));
         return shuffle(picked);
     }
 
@@ -97,7 +97,7 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             $interval.cancel(timerInterval);
             timerInterval = null;
         }
-        if ($scope.score >= 8) {
+        if ($scope.score >= 10) {
             $scope.page = 4; // Win
         } else {
             $scope.page = 5; // Lose
