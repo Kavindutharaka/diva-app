@@ -213,33 +213,75 @@
       100% { left: 120%; }
     }
 
-    /* Progress bar */
-    .progress-bar-container {
-      width: 700px;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 20px;
-      overflow: hidden;
-      margin-top: 15px;
+    /* Progress bar with heart marker */
+    .progress-wrapper {
       position: relative;
+      width: 700px;
+      height: 24px;
+      margin: 20px 0;
     }
 
-    .progress-bar-fill {
+    .progress-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, #22c55e, #4ade80);
+      background-color: #ffffff;
       border-radius: 20px;
-      transition: width 0.4s ease;
-      min-width: 0;
     }
 
-    .progress-bar-text {
+    .progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: #ae2761;
+      border-radius: 20px 0 0 20px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-fill.full {
+      border-radius: 20px;
+    }
+
+    .heart-marker {
       position: absolute;
       top: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      width: 55px;
+      height: 55px;
+      z-index: 10;
+      transition: left 0.3s ease;
+      pointer-events: none;
+    }
+
+    .heart-marker path {
+      fill: #921b51;
+    }
+
+    .progress-label {
+      position: absolute;
+      top: -38px;
       left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 22px;
-      color: white;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .progress-label-text {
+      font-size: 24px;
+      color: #921b51;
+    }
+
+    .progress-label-score {
+      font-size: 26px;
+      color: #921b51;
+      background: rgba(255,255,255,0.5);
+      padding: 2px 12px;
+      border-radius: 6px;
     }
 
     /* Button shake */
@@ -305,9 +347,21 @@
         <img style="width: 400px;" src="./img/Asset 2.png" />
         <div class="timer-display">{{timer}}s</div>
         <div class="score-display">{{score}} / {{currentCardIndex + (currentCardIndex < cards.length ? 1 : 0)}}</div>
-        <div class="progress-bar-container">
-          <div class="progress-bar-fill" ng-style="{'width': (currentCardIndex / cards.length * 100) + '%'}"></div>
-          <div class="progress-bar-text">{{currentCardIndex}} / {{cards.length}}</div>
+        <div class="progress-wrapper">
+          <div class="progress-label">
+            <svg width="20" height="18" viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#921b51" d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+            </svg>
+            <span class="progress-label-text">Your Score</span>
+            <span class="progress-label-score">{{score < 10 ? '0' + score : score}}</span>
+          </div>
+          <div class="progress-track"></div>
+          <div class="progress-fill" ng-class="{'full': score === cards.length}" ng-style="{'width': getScorePercentage() + '%'}"></div>
+          <div class="heart-marker" ng-style="{'left': getScorePercentage() + '%'}">
+            <svg viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+            </svg>
+          </div>
         </div>
       </div>
       <img ng-click="swipeCard('left')" src="./img/Asset 12.png" class="side-indicator left" />
@@ -327,11 +381,23 @@
     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 120px;">
       <img style="width: 400px;" src="./img/Asset 2.png" />
       <!-- Progress bar showing final score user got -->
-      <div class="progress-bar-container" style="margin-top: 20px;">
-        <div class="progress-bar-fill" ng-style="{'width': (score / cards.length * 100) + '%'}"></div>
-        <div class="progress-bar-text">{{score}} / {{cards.length}} Correct</div>
+      <div class="progress-wrapper" style="margin-top: 30px;">
+        <div class="progress-label">
+          <svg width="20" height="18" viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#921b51" d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+          </svg>
+          <span class="progress-label-text">Your Score</span>
+          <span class="progress-label-score">{{score < 10 ? '0' + score : score}}</span>
+        </div>
+        <div class="progress-track"></div>
+        <div class="progress-fill" ng-class="{'full': score === cards.length}" ng-style="{'width': getScorePercentage() + '%'}"></div>
+        <div class="heart-marker" ng-style="{'left': getScorePercentage() + '%'}">
+          <svg viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+          </svg>
+        </div>
       </div>
-      <img style="margin-top: -45px;" src="./img/Asset 14.png" />
+      <img style="margin-top: 15px;" src="./img/Asset 14.png" />
       <img style="width: 80%; margin-top: -38px;" src="./img/Asset 17.png" />
       <img style="margin-top: 15px;" src="./img/Asset 15.png" />
     </div>
@@ -341,9 +407,21 @@
     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 120px;">
       <img style="width: 400px; margin-bottom: 50px;" src="./img/Asset 2.png" />
       <!-- Progress bar showing final score user got -->
-      <div class="progress-bar-container" style="margin-bottom: 20px;">
-        <div class="progress-bar-fill" ng-style="{'width': (score / cards.length * 100) + '%'}"></div>
-        <div class="progress-bar-text">{{score}} / {{cards.length}} Correct</div>
+      <div class="progress-wrapper" style="margin-bottom: 30px;">
+        <div class="progress-label">
+          <svg width="20" height="18" viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#921b51" d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+          </svg>
+          <span class="progress-label-text">Your Score</span>
+          <span class="progress-label-score">{{score < 10 ? '0' + score : score}}</span>
+        </div>
+        <div class="progress-track"></div>
+        <div class="progress-fill" ng-class="{'full': score === cards.length}" ng-style="{'width': getScorePercentage() + '%'}"></div>
+        <div class="heart-marker" ng-style="{'left': getScorePercentage() + '%'}">
+          <svg viewBox="0 0 32 29.6" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+          </svg>
+        </div>
       </div>
       <img src="./img/Asset 16.png" />
       <img style="width: 80%; margin-top: 90px;" src="./img/Asset 17.png" />

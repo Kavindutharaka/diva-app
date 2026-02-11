@@ -249,6 +249,13 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
         };
     }
 
+    // Progress bar percentage helper
+    $scope.getScorePercentage = function () {
+        if (!$scope.cards.length) return 0;
+        var pct = ($scope.score / $scope.cards.length) * 100;
+        return Math.min(100, Math.max(0, pct));
+    };
+
     $scope.pg_up = function () {
         $scope.page++;
     };
