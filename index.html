@@ -30,8 +30,32 @@
       font-style: normal;
     }
 
+    @font-face {
+      font-family: 'Berkshire Swash';
+      src: url('fonts/berkshireswash-regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Bulgaria Dreams';
+      src: url('fonts/BulgariaDreamsRegular-ALOl2.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('fonts/Montserrat-Italic-VariableFont_wght.ttf') format('truetype');
+      font-weight: 100 900;
+      /* variable range */
+      font-style: italic;
+    }
+
+
     body {
       font-family: "AvantGardeBold", sans-serif;
+      overflow: hidden;
     }
 
     .game-area {
@@ -48,10 +72,9 @@
       width: 972px;
       height: 1811px;
       border: 54px solid transparent;
-      border-radius: 69px;
       position: absolute;
-      top: 0;
-      left: 0;
+      top: -7px;
+      left: -8px;
       pointer-events: none;
       transition: border-color 0.15s ease-in;
     }
@@ -69,7 +92,7 @@
     .swipe-card {
       position: absolute;
       left: 50%;
-      top: 68%;
+      top: 75%;
       transform: translate(-50%, -50%);
       width: 550px;
       cursor: grab;
@@ -95,7 +118,7 @@
 
     .side-indicator {
       position: absolute;
-      top: 68%;
+      top: 43%;
       transform: translateY(-50%);
       z-index: 5;
       cursor: pointer;
@@ -103,26 +126,33 @@
 
     .side-indicator.left {
       left: 15px;
-      width: 140px;
+      width: 148px;
     }
 
     .side-indicator.right {
-      right: 15px;
-      width: 160px;
+      right: 20px;
+      width: 115px;
     }
 
     .timer-display {
-      font-size: 110px;
+      font-family: 'Montserrat', sans-serif;
+      position: absolute;
+      top: 95px;
+      left: 447px;
+      font-size: 68px;
       color: white;
       text-align: center;
-      margin-top: 20px;
+      font-weight: bold;
     }
 
     .score-display {
+      font-family: 'Montserrat', sans-serif;
+      position: absolute;
+      top: 339px;
+      left: 453px;
       font-size: 50px;
       color: white;
       text-align: center;
-      margin-top: 10px;
     }
 
     /* Page 1 sparkle overlay */
@@ -170,23 +200,167 @@
       transform: translateX(-50%);
     }
 
-    @keyframes sparkle {
-      0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
-      50% { opacity: 1; transform: scale(1) rotate(180deg); }
+    .progress-wrapper {
+      position: relative;
+      width: 80%;
+      max-width: 600px;
+      height: 24px;
+      margin: 40px 0;
     }
 
-    .sparkle:nth-child(1) { top: 12%; left: 15%; animation-delay: 0s; width: 14px; height: 14px; }
-    .sparkle:nth-child(2) { top: 30%; left: 80%; animation-delay: 0.4s; width: 10px; height: 10px; }
-    .sparkle:nth-child(3) { top: 55%; left: 25%; animation-delay: 0.8s; width: 16px; height: 16px; }
-    .sparkle:nth-child(4) { top: 70%; left: 70%; animation-delay: 1.2s; width: 11px; height: 11px; }
-    .sparkle:nth-child(5) { top: 20%; left: 50%; animation-delay: 1.6s; width: 13px; height: 13px; }
-    .sparkle:nth-child(6) { top: 85%; left: 40%; animation-delay: 0.3s; width: 9px; height: 9px; }
-    .sparkle:nth-child(7) { top: 45%; left: 90%; animation-delay: 1.0s; width: 15px; height: 15px; }
-    .sparkle:nth-child(8) { top: 65%; left: 10%; animation-delay: 1.8s; width: 12px; height: 12px; }
-    .sparkle:nth-child(9) { top: 8%; left: 65%; animation-delay: 0.6s; width: 10px; height: 10px; }
-    .sparkle:nth-child(10) { top: 40%; left: 55%; animation-delay: 2.0s; width: 14px; height: 14px; }
-    .sparkle:nth-child(11) { top: 90%; left: 85%; animation-delay: 1.4s; width: 11px; height: 11px; }
-    .sparkle:nth-child(12) { top: 75%; left: 35%; animation-delay: 0.2s; width: 13px; height: 13px; }
+    .progress-track {
+      /* position: absolute;
+      top: 0;
+      left: 0; */
+      width: 100%;
+      height: 100%;
+      background-color: #ffffff;
+      border-radius: 20px;
+    }
+
+    /* UPDATED: Bar color */
+    .progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: #ae2761;
+      /* The new bar color */
+      border-radius: 20px 0 0 20px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-fill.full {
+      border-radius: 20px;
+    }
+
+    .heart-marker {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      width: 55px;
+      /* Slightly larger to match the image overlap */
+      height: 55px;
+      z-index: 10;
+      transition: left 0.3s ease;
+      pointer-events: none;
+    }
+
+    /* UPDATED: Heart color */
+    .heart-marker path {
+      fill: #921b51;
+      /* The new heart color */
+    }
+
+    @keyframes sparkle {
+
+      0%,
+      100% {
+        opacity: 0;
+        transform: scale(0.3) rotate(0deg);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1) rotate(180deg);
+      }
+    }
+
+    .sparkle:nth-child(1) {
+      top: 12%;
+      left: 15%;
+      animation-delay: 0s;
+      width: 14px;
+      height: 14px;
+    }
+
+    .sparkle:nth-child(2) {
+      top: 30%;
+      left: 80%;
+      animation-delay: 0.4s;
+      width: 10px;
+      height: 10px;
+    }
+
+    .sparkle:nth-child(3) {
+      top: 55%;
+      left: 25%;
+      animation-delay: 0.8s;
+      width: 16px;
+      height: 16px;
+    }
+
+    .sparkle:nth-child(4) {
+      top: 70%;
+      left: 70%;
+      animation-delay: 1.2s;
+      width: 11px;
+      height: 11px;
+    }
+
+    .sparkle:nth-child(5) {
+      top: 20%;
+      left: 50%;
+      animation-delay: 1.6s;
+      width: 13px;
+      height: 13px;
+    }
+
+    .sparkle:nth-child(6) {
+      top: 85%;
+      left: 40%;
+      animation-delay: 0.3s;
+      width: 9px;
+      height: 9px;
+    }
+
+    .sparkle:nth-child(7) {
+      top: 45%;
+      left: 90%;
+      animation-delay: 1.0s;
+      width: 15px;
+      height: 15px;
+    }
+
+    .sparkle:nth-child(8) {
+      top: 65%;
+      left: 10%;
+      animation-delay: 1.8s;
+      width: 12px;
+      height: 12px;
+    }
+
+    .sparkle:nth-child(9) {
+      top: 8%;
+      left: 65%;
+      animation-delay: 0.6s;
+      width: 10px;
+      height: 10px;
+    }
+
+    .sparkle:nth-child(10) {
+      top: 40%;
+      left: 55%;
+      animation-delay: 2.0s;
+      width: 14px;
+      height: 14px;
+    }
+
+    .sparkle:nth-child(11) {
+      top: 90%;
+      left: 85%;
+      animation-delay: 1.4s;
+      width: 11px;
+      height: 11px;
+    }
+
+    .sparkle:nth-child(12) {
+      top: 75%;
+      left: 35%;
+      animation-delay: 0.2s;
+      width: 13px;
+      height: 13px;
+    }
 
     /* Glass shine sweep */
     .shine-overlay {
@@ -195,22 +369,28 @@
       left: -60%;
       width: 40%;
       height: 100%;
-      background: linear-gradient(
-        105deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.05) 30%,
-        rgba(255, 255, 255, 0.15) 50%,
-        rgba(255, 255, 255, 0.05) 70%,
-        transparent 100%
-      );
+      background: linear-gradient(105deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.05) 30%,
+          rgba(255, 255, 255, 0.15) 50%,
+          rgba(255, 255, 255, 0.05) 70%,
+          transparent 100%);
       animation: shine-sweep 4s ease-in-out infinite;
       pointer-events: none;
     }
 
     @keyframes shine-sweep {
-      0% { left: -60%; }
-      50% { left: 120%; }
-      100% { left: 120%; }
+      0% {
+        left: -60%;
+      }
+
+      50% {
+        left: 120%;
+      }
+
+      100% {
+        left: 120%;
+      }
     }
 
     /* Progress bar */
@@ -249,19 +429,39 @@
     }
 
     @keyframes shake {
-      0%, 70%, 100% { transform: translateX(0); }
-      75% { transform: translateX(-12px) rotate(-3deg); }
-      80% { transform: translateX(10px) rotate(2deg); }
-      85% { transform: translateX(-8px) rotate(-2deg); }
-      90% { transform: translateX(6px) rotate(1deg); }
-      95% { transform: translateX(-3px); }
+
+      0%,
+      70%,
+      100% {
+        transform: translateX(0);
+      }
+
+      75% {
+        transform: translateX(-12px) rotate(-3deg);
+      }
+
+      80% {
+        transform: translateX(10px) rotate(2deg);
+      }
+
+      85% {
+        transform: translateX(-8px) rotate(-2deg);
+      }
+
+      90% {
+        transform: translateX(6px) rotate(1deg);
+      }
+
+      95% {
+        transform: translateX(-3px);
+      }
     }
   </style>
 </head>
 
-<body ng-controller="MainCtrl" style="background: url(./img/Artboard\ 1.png);">
+<body ng-controller="MainCtrl" style="background: url(./png/bg.png);">
 
-  <section ng-show="page == 1" style="position: relative;">
+  <section ng-show="page == 1" style="position: relative; width: 1080px; height: 1920px;">
     <div class="sparkle-container">
       <div class="shine-overlay"></div>
       <div class="sparkle"></div>
@@ -279,27 +479,29 @@
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 280px;">
       <img style="width: 400px;" src="./img/Asset 2.png" />
-      <img ng-click="pg_up()" class="shake-btn" style="margin-top: 450px;" src="./img/Asset 10.png">
+      <img ng-click="pg_up()" class="shake-btn" style="margin-top: 180px;" src="./png/home_text.png">
     </div>
   </section>
 
-  <section ng-show="page == 2">
+  <section ng-show="page == 2" style="width: 1080px; height: 1920px;">
     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 80px;">
       <img style="width: 400px;" src="./img/Asset 2.png" />
-      <div style="display: flex; flex-direction: column; text-align: center;  gap: 40px; margin-top: 100px;">
-        <span style="font-size: 80px; color: white;">NAME</span>
+      <div
+        style="display: flex; flex-direction: column; text-align: center;  gap: 40px; margin-top: 100px; width: 80%;">
+        <span style="font-size: 80px; color: #931c51; font-family: 'Berkshire Swash', cursive;">NAME</span>
         <input class="focus:outline-none border-none "
-          style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 30px;" type="text" />
-        <span style="font-size: 80px; color: white;">Mobile No.</span>
+          style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 40px; color: #931c51; text-transform: uppercase; font-weight: bold;"
+          type="text" />
+        <span style="font-size: 80px; color: #931c51; font-family: 'Berkshire Swash', cursive;">Mobile No.</span>
         <input class="focus:outline-none border-none "
-          style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 30px;" type="text" />
+          style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 40px; color: #931c51; text-transform: uppercase; font-weight: bold;"
+          type="text" />
       </div>
-      <button ng-click="startGame()"
-        style="font-size: 60px; background-color: white; color: palevioletred; padding: 20px 70px; border: none; margin-top: 180px; border-radius: 30px;">Start</button>
+      <img ng-click="startGame()" style="margin-top: 180px;" src="./png/start_btn.png">
     </div>
   </section>
 
-  <section ng-show="page == 3" style="position: relative;">
+  <section ng-show="page == 3" style="position: relative; width: 1080px; height: 1920px;">
     <div class="game-area">
       <div style="display: flex; flex-direction: column; align-items: center; padding-top: 120px; width: 100%;">
         <img style="width: 400px;" src="./img/Asset 2.png" />
@@ -319,11 +521,10 @@
           ng-src="{{currentCard.image}}"
         />
       </div>
-    </div>
-    <div class="correct-sel-border"></div>
+      <div class="correct-sel-border"></div>
   </section>
 
-  <section ng-show="page == 4">
+  <section ng-show="page == 4" style="width: 1080px; height: 1920px;">
     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 120px;">
       <img style="width: 400px;" src="./img/Asset 2.png" />
       <!-- Progress bar showing final score user got -->
@@ -337,7 +538,7 @@
     </div>
   </section>
 
-  <section ng-show="page == 5">
+  <section ng-show="page == 5" style="width: 1080px; height: 1920px;">
     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 120px;">
       <img style="width: 400px; margin-bottom: 50px;" src="./img/Asset 2.png" />
       <!-- Progress bar showing final score user got -->
