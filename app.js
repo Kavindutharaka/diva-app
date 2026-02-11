@@ -129,24 +129,15 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             isCorrect = true;
         }
 
-        var borderEl = document.querySelector('.correct-sel-border');
         if (isCorrect) {
             $scope.score++;
-            if (borderEl) {
-                borderEl.classList.remove('fade-out');
-                borderEl.classList.add('correct-answer');
-            }
+            card.classList.add('correct-answer');
+        } else {
+            card.classList.add('wrong-answer');
         }
 
         // Wait for animation to complete, then show next card
         $timeout(function () {
-            if (borderEl && isCorrect) {
-                borderEl.classList.remove('correct-answer');
-                borderEl.classList.add('fade-out');
-                $timeout(function () {
-                    if (borderEl) borderEl.classList.remove('fade-out');
-                }, 500);
-            }
             $scope.currentCardIndex++;
             if ($scope.currentCardIndex < $scope.cards.length) {
                 $scope.currentCard = $scope.cards[$scope.currentCardIndex];
@@ -180,7 +171,7 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
         if (!card) return;
 
         // Reset classes and styles
-        card.classList.remove('animating', 'swipe-left', 'swipe-right');
+        card.classList.remove('animating', 'swipe-left', 'swipe-right', 'correct-answer', 'wrong-answer');
         card.style.transform = 'translate(-50%, -50%)';
         card.style.opacity = '1';
 
