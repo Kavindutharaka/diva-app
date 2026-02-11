@@ -3,10 +3,10 @@ var app = angular.module('FitnessApp', []);
 app.controller('MainCtrl', function ($scope, $interval, $timeout) {
     console.log("App Started!");
 
-    $scope.page = 1;
+    $scope.page = 5;
 
     // Swipe game state
-    $scope.timer = 60;
+    $scope.timer = 30;
     $scope.score = 0;
     $scope.currentCardIndex = 0;
     $scope.cards = [];
@@ -52,6 +52,11 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
         return shuffled;
     }
 
+    $scope.getPercentage = function() {
+                var pct = ($scope.score / $scope.currentCardIndex) * 100;
+                return Math.min(100, Math.max(0, pct));
+            };
+
     // Pick 5 random from each category and combine
     function generateDeck() {
         var shuffledRazor = shuffle(razorCards);
@@ -63,7 +68,7 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
     // Start the game
     $scope.startGame = function () {
         $scope.page = 3;
-        $scope.timer = 60;
+        $scope.timer = 30;
         $scope.score = 0;
         $scope.currentCardIndex = 0;
         $scope.cards = generateDeck();
