@@ -3,7 +3,7 @@ var app = angular.module('FitnessApp', []);
 app.controller('MainCtrl', function ($scope, $interval, $timeout) {
     console.log("App Started!");
 
-    $scope.page = 5;
+    $scope.page = 1;
 
     // Swipe game state
     $scope.timer = 30;
