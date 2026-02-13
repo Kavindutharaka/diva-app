@@ -183,8 +183,15 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             var scoreEl = document.querySelector('.score-display');
             if (scoreEl) {
                 scoreEl.classList.remove('score-pop');
-                void scoreEl.offsetWidth; // force reflow to restart animation
+                void scoreEl.offsetWidth;
                 scoreEl.classList.add('score-pop');
+            }
+            // Heart pop on progress bar
+            var heartEl = document.querySelector('.game-area .heart-marker');
+            if (heartEl) {
+                heartEl.classList.remove('heart-pop');
+                void heartEl.offsetWidth;
+                heartEl.classList.add('heart-pop');
             }
         } else {
             card.classList.add('wrong-answer');
