@@ -111,6 +111,14 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             timerInterval = $interval(function () {
                 $scope.timer--;
 
+                // Timer image flash when <=10 seconds
+                if ($scope.timer <= 10) {
+                    var timerImg = document.querySelector('.timer-img');
+                    if (timerImg && !timerImg.classList.contains('timer-img-flash')) {
+                        timerImg.classList.add('timer-img-flash');
+                    }
+                }
+
                 // Timer urgency: pulse red in last 5 seconds
                 if ($scope.timer <= 5) {
                     var timerEl = document.querySelector('.timer-display');

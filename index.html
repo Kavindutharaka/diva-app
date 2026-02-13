@@ -494,6 +494,20 @@
       }
     }
 
+    /* Timer PNG flash when <=10s */
+    .timer-img-flash {
+      animation: timerImgFlash 1s ease-in-out infinite;
+    }
+
+    @keyframes timerImgFlash {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.3;
+      }
+    }
+
     /* ===== SCORE POP ===== */
     .score-display.score-pop {
       animation: scorePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -687,7 +701,7 @@
   <section ng-show="page == 3" style="position: relative; width: 1080px; height: 1920px;">
     <div class="game-area">
       <div style="display: flex; flex-direction: column; align-items: center; padding-top: 60px; width: 100%;">
-        <img src="./png/timer.png" />
+        <img class="timer-img" src="./png/timer.png" />
         <div class="timer-display">00:{{ (timer < 10) ? '0' + timer : timer }}</div>
         <img style="margin: 100px 0;" src="./png/glass_board.png" />
         <img style="position: absolute; top: 330px; left: 422px;" src="./png/progress_panel_score.png">
