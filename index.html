@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="FitnessApp" ng-cloak>
+<html lang="en" ng-app="FitnessApp" ng-cloak style="touch-action: manipulation; -ms-touch-action: manipulation; -ms-content-zooming: none;">
 
 <head>
   <meta charset="UTF-8">
@@ -56,6 +56,17 @@
     body {
       font-family: "AvantGardeBold", sans-serif;
       overflow: hidden;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    input {
+      -webkit-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
     }
 
     .game-area {
@@ -708,7 +719,7 @@
   </style>
 </head>
 
-<body ng-controller="MainCtrl" style="background: url(./png/bg.png);">
+<body ng-controller="MainCtrl" style="background: url(./png/bg.png); touch-action: manipulation;" oncontextmenu="return false;">
 
   <section ng-show="page == 1" style="position: relative; width: 1080px; height: 1920px;">
     <div class="sparkle-container">
@@ -738,13 +749,13 @@
       <div
         style="display: flex; flex-direction: column; text-align: center;  gap: 40px; margin-top: 100px; width: 80%;">
         <span style="font-size: 80px; color: #931c51; font-family: 'Berkshire Swash', cursive;">Name</span>
-        <input class="focus:outline-none border-none "
+        <input class="focus:outline-none border-none " ng-model="playerName"
           style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 40px; color: #931c51; text-transform: capitalize; font-weight: bold;"
           type="text" />
         <span style="font-size: 80px; color: #931c51; font-family: 'Berkshire Swash', cursive;">Mobile No.</span>
-        <input class="focus:outline-none border-none "
+        <input class="focus:outline-none border-none " ng-model="playerTp"
           style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 40px; color: #931c51; text-transform: uppercase; font-weight: bold;"
-          type="text" />
+          type="tel" />
       </div>
       <img ng-click="startGame()" style="margin-top: 180px;" src="./png/start_btn.png">
     </div>

@@ -1,9 +1,26 @@
 var app = angular.module('FitnessApp', []);
 
-app.controller('MainCtrl', function ($scope, $interval, $timeout) {
+app.controller('MainCtrl', function ($scope, $interval, $timeout, $http) {
     console.log("App Started!");
 
     $scope.page = 1;
+    $scope.playerName = '';
+    $scope.playerTp = '';
+
+    // Disable pinch zoom and double-tap zoom globally for kiosk
+    document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+    document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
+    document.addEventListener('gestureend', function(e) { e.preventDefault(); });
+
+    // Prevent ctrl+wheel zoom and ctrl+plus/minus
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
+            e.preventDefault();
+        }
+    });
+    document.addEventListener('wheel', function(e) {
+        if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
 
     // Smooth page transition helper
     function goToPage(newPage) {
@@ -95,6 +112,19 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
         return shuffle(picked);
     }
 
+    // Save game data to PHP/CSV
+    function saveGameData() {
+        $http.post('./save_data.php', {
+            name: $scope.playerName || '',
+            tp: $scope.playerTp || '',
+            score: $scope.score
+        }).then(function(response) {
+            console.log('Data saved:', response.data);
+        }, function(error) {
+            console.error('Save failed:', error);
+        });
+    }
+
     // Start the game
     $scope.startGame = function () {
         $scope.timer = 30;
@@ -144,6 +174,7 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             $interval.cancel(timerInterval);
             timerInterval = null;
         }
+        saveGameData();
         if ($scope.score >= 10) {
             goToPage(4); // Win
         } else {
@@ -245,25 +276,24 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             card.removeEventListener('animationend', handler);
         });
 
-        // Touch events
-        card.ontouchstart = function (e) {
+        // Unified drag start/move/end handlers
+        function onDragStart(x) {
             isDragging = true;
-            startX = e.touches[0].clientX;
-            currentX = startX;
+            startX = x;
+            currentX = x;
             card.style.transition = 'none';
-        };
+        }
 
-        card.ontouchmove = function (e) {
+        function onDragMove(x) {
             if (!isDragging) return;
-            e.preventDefault();
-            currentX = e.touches[0].clientX;
+            currentX = x;
             var deltaX = currentX - startX;
             var styles = getDragTransform(deltaX);
             card.style.transform = styles.transform;
             card.style.opacity = styles.opacity;
-        };
+        }
 
-        card.ontouchend = function (e) {
+        function onDragEnd() {
             if (!isDragging) return;
             isDragging = false;
             var deltaX = currentX - startX;
@@ -278,42 +308,50 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
                 card.style.transform = 'translate(-50%, -50%)';
                 card.style.opacity = '1';
             }
-        };
+        }
 
-        // Mouse events for desktop
-        card.onmousedown = function (e) {
-            isDragging = true;
-            startX = e.clientX;
-            currentX = e.clientX;
-            card.style.transition = 'none';
-            e.preventDefault();
-        };
+        // Pointer Events (Windows touch kiosk + modern browsers)
+        if (window.PointerEvent) {
+            card.style.touchAction = 'none';
+            card.onpointerdown = function (e) {
+                card.setPointerCapture(e.pointerId);
+                onDragStart(e.clientX);
+                e.preventDefault();
+            };
+            card.onpointermove = function (e) {
+                onDragMove(e.clientX);
+            };
+            card.onpointerup = function (e) {
+                onDragEnd();
+            };
+            card.onpointercancel = function (e) {
+                onDragEnd();
+            };
+        } else {
+            // Touch events (Android / iOS fallback)
+            card.ontouchstart = function (e) {
+                onDragStart(e.touches[0].clientX);
+            };
+            card.ontouchmove = function (e) {
+                e.preventDefault();
+                onDragMove(e.touches[0].clientX);
+            };
+            card.ontouchend = function () {
+                onDragEnd();
+            };
 
-        document.onmousemove = function (e) {
-            if (!isDragging) return;
-            currentX = e.clientX;
-            var deltaX = currentX - startX;
-            var styles = getDragTransform(deltaX);
-            card.style.transform = styles.transform;
-            card.style.opacity = styles.opacity;
-        };
-
-        document.onmouseup = function (e) {
-            if (!isDragging) return;
-            isDragging = false;
-            var deltaX = currentX - startX;
-            if (Math.abs(deltaX) > 80) {
-                var direction = deltaX < 0 ? 'left' : 'right';
-                $scope.$apply(function () {
-                    animateSwipe(direction);
-                });
-            } else {
-                // Snap back with spring feel
-                card.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease';
-                card.style.transform = 'translate(-50%, -50%)';
-                card.style.opacity = '1';
-            }
-        };
+            // Mouse events (desktop fallback)
+            card.onmousedown = function (e) {
+                onDragStart(e.clientX);
+                e.preventDefault();
+            };
+            document.onmousemove = function (e) {
+                onDragMove(e.clientX);
+            };
+            document.onmouseup = function () {
+                onDragEnd();
+            };
+        }
     }
 
     $scope.pg_up = function () {
