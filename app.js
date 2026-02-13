@@ -7,6 +7,108 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout, $http) {
     $scope.playerName = '';
     $scope.playerTp = '';
 
+    // ===== CUSTOM ON-SCREEN KEYBOARD =====
+    $scope.activeKeyboard = null; // 'name' or 'tp' or null
+    $scope.shiftActive = true; // Start with shift on for first letter capitalization
+    $scope.nameError = '';
+    $scope.tpError = '';
+
+    // QWERTY layout rows
+    $scope.qwertyRow1 = ['q','w','e','r','t','y','u','i','o','p'];
+    $scope.qwertyRow2 = ['a','s','d','f','g','h','j','k','l'];
+    $scope.qwertyRow3 = ['z','x','c','v','b','n','m'];
+
+    $scope.openKeyboard = function(type) {
+        $scope.nameError = '';
+        $scope.tpError = '';
+        if (type === 'name') {
+            $scope.shiftActive = ($scope.playerName.length === 0); // Shift on if empty (first letter)
+        }
+        $scope.activeKeyboard = type;
+    };
+
+    $scope.closeKeyboard = function($event) {
+        // Only close if clicking the overlay background (not the keyboard itself)
+        if ($event.target.classList.contains('keyboard-overlay')) {
+            $scope.activeKeyboard = null;
+        }
+    };
+
+    $scope.typeKey = function(key) {
+        if ($scope.activeKeyboard === 'name') {
+            var ch = $scope.shiftActive ? key.toUpperCase() : key.toLowerCase();
+            $scope.playerName = $scope.playerName + ch;
+            // Auto-disable shift after first character typed (unless it was space)
+            if ($scope.shiftActive && key !== ' ') {
+                $scope.shiftActive = false;
+            }
+        } else if ($scope.activeKeyboard === 'tp') {
+            // Only allow digits, max 10
+            if ($scope.playerTp.length < 10) {
+                $scope.playerTp = $scope.playerTp + key;
+            }
+        }
+    };
+
+    $scope.backspaceKey = function() {
+        if ($scope.activeKeyboard === 'name' && $scope.playerName.length > 0) {
+            $scope.playerName = $scope.playerName.slice(0, -1);
+        } else if ($scope.activeKeyboard === 'tp' && $scope.playerTp.length > 0) {
+            $scope.playerTp = $scope.playerTp.slice(0, -1);
+        }
+    };
+
+    $scope.toggleShift = function() {
+        $scope.shiftActive = !$scope.shiftActive;
+    };
+
+    $scope.doneKey = function() {
+        $scope.activeKeyboard = null;
+    };
+
+    // Validation + start game
+    $scope.validateAndStart = function() {
+        var valid = true;
+        $scope.nameError = '';
+        $scope.tpError = '';
+
+        // Clear previous blink animations by forcing reflow
+        var nameInput = document.getElementById('nameInput');
+        var tpInput = document.getElementById('tpInput');
+
+        if (!$scope.playerName || $scope.playerName.trim().length < 3) {
+            valid = false;
+            // Remove and re-add class for re-blink
+            if (nameInput) {
+                nameInput.classList.remove('input-error-blink');
+                void nameInput.offsetWidth;
+            }
+            $scope.nameError = 'Name must be at least 3 characters';
+        }
+
+        if (!$scope.playerTp || $scope.playerTp.length !== 10 || !/^\d{10}$/.test($scope.playerTp)) {
+            valid = false;
+            if (tpInput) {
+                tpInput.classList.remove('input-error-blink');
+                void tpInput.offsetWidth;
+            }
+            $scope.tpError = 'Mobile number must be 10 digits';
+        }
+
+        if (!valid) {
+            // Auto-clear errors after animation completes (3 blinks × 0.5s = 1.5s + buffer)
+            $timeout(function() {
+                $scope.nameError = '';
+                $scope.tpError = '';
+            }, 3000);
+            return;
+        }
+
+        // Close keyboard if open and start game
+        $scope.activeKeyboard = null;
+        $scope.startGame();
+    };
+
     // Disable pinch zoom and double-tap zoom globally for kiosk
     document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
     document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
