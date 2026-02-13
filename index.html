@@ -716,6 +716,174 @@
     .heart-marker.animate-fill {
       animation: heartSlide 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
     }
+
+    /* ===== CUSTOM ON-SCREEN KEYBOARD ===== */
+    .keyboard-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1080px;
+      height: 1920px;
+      z-index: 99;
+    }
+
+    .keyboard-container {
+      position: absolute;
+      bottom: 774px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 94%;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 24px;
+      padding: 22px 14px 24px 14px;
+      z-index: 100;
+      animation: keyboardSlideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes keyboardSlideUp {
+      0% { transform: translateX(-50%) translateY(40px); opacity: 0; }
+      100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    .keyboard-row {
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+      margin-bottom: 9px;
+    }
+
+    .kb-key {
+      min-width: 82px;
+      height: 74px;
+      border-radius: 12px;
+      border: none;
+      background: #921b51;
+      color: #fff;
+      font-size: 34px;
+      font-family: "AvantGardeBold", sans-serif;
+      font-weight: bold;
+      box-shadow: 0 3px 0 #6e1540, 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s, transform 0.08s;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
+      text-transform: uppercase;
+    }
+
+    .kb-key:active {
+      background: #b8245f;
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #6e1540, 0 2px 3px rgba(0,0,0,0.15);
+    }
+
+    .kb-key.kb-space {
+      min-width: 420px;
+      font-size: 24px;
+      letter-spacing: 4px;
+      background: #7a1745;
+    }
+
+    .kb-key.kb-backspace {
+      min-width: 100px;
+      font-size: 30px;
+      background: #7a1745;
+    }
+
+    .kb-key.kb-shift {
+      min-width: 100px;
+      font-size: 26px;
+      background: #7a1745;
+    }
+
+    .kb-key.kb-shift.active {
+      background: #fff;
+      box-shadow: 0 3px 0 #921b51, 0 4px 8px rgba(146,27,81,0.35);
+      color: #921b51;
+    }
+
+    .kb-key.kb-done {
+      min-width: 170px;
+      font-size: 28px;
+      background: #2ecc71;
+      color: #fff;
+      box-shadow: 0 3px 0 #27ae60, 0 4px 8px rgba(46,204,113,0.3);
+      letter-spacing: 2px;
+    }
+
+    .kb-key.kb-done:active {
+      background: #27ae60;
+      transform: translateY(2px);
+    }
+
+    /* Number pad — single row layout like reference */
+    .numpad-container {
+      bottom: 655px;
+    }
+
+    .numpad-container .keyboard-row {
+      gap: 6px;
+    }
+
+    .numpad-container .kb-key {
+      min-width: 78px;
+      height: 78px;
+      font-size: 40px;
+    }
+
+    .numpad-container .kb-key.kb-backspace {
+      min-width: 78px;
+      font-size: 28px;
+    }
+
+    .numpad-container .keyboard-row.numpad-done-row {
+      margin-top: 6px;
+    }
+
+    .numpad-container .numpad-done-row .kb-done {
+      min-width: 220px;
+    }
+
+    /* ===== INPUT VALIDATION ===== */
+    .input-error-blink {
+      animation: inputErrorBlink 0.5s ease 3;
+    }
+
+    @keyframes inputErrorBlink {
+      0%, 100% {
+        box-shadow: none;
+      }
+      50% {
+        box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.7), inset 0 0 20px rgba(239, 68, 68, 0.15);
+      }
+    }
+
+    .input-error-text {
+      color: #ef4444;
+      font-size: 28px;
+      font-family: "AvantGardeBold", sans-serif;
+      margin-top: -25px;
+      opacity: 0;
+      animation: errorTextFade 3s ease forwards;
+    }
+
+    @keyframes errorTextFade {
+      0% { opacity: 0; transform: translateY(-5px); }
+      10% { opacity: 1; transform: translateY(0); }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .active-input {
+      box-shadow: 0 0 0 4px rgba(147, 28, 81, 0.5) !important;
+      transition: box-shadow 0.2s ease;
+    }
   </style>
 </head>
 
@@ -743,21 +911,66 @@
     </div>
   </section>
 
-  <section ng-show="page == 2" style="width: 1080px; height: 1920px;">
+  <section ng-show="page == 2" style="width: 1080px; height: 1920px; position: relative;">
     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 80px;">
       <img style="width: 400px;" src="./img/Asset 2.png" />
       <div
-        style="display: flex; flex-direction: column; text-align: center;  gap: 40px; margin-top: 100px; width: 80%;">
+        style="display: flex; flex-direction: column; text-align: center; gap: 40px; margin-top: 100px; width: 80%;">
         <span style="font-size: 80px; color: #931c51; font-family: 'Berkshire Swash', cursive;">Name</span>
-        <input class="focus:outline-none border-none " ng-model="playerName"
+        <input id="nameInput" class="focus:outline-none border-none" ng-model="playerName" ng-class="{'active-input': activeKeyboard === 'name', 'input-error-blink': nameError}"
           style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 40px; color: #931c51; text-transform: capitalize; font-weight: bold;"
-          type="text" />
+          type="text" readonly ng-click="openKeyboard('name')" />
+        <div class="input-error-text" ng-show="nameError">{{nameError}}</div>
         <span style="font-size: 80px; color: #931c51; font-family: 'Berkshire Swash', cursive;">Mobile No.</span>
-        <input class="focus:outline-none border-none " ng-model="playerTp"
-          style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 40px; color: #931c51; text-transform: uppercase; font-weight: bold;"
-          type="tel" />
+        <input id="tpInput" class="focus:outline-none border-none" ng-model="playerTp" ng-class="{'active-input': activeKeyboard === 'tp', 'input-error-blink': tpError}"
+          style="font-size: 60px; text-align: center; padding: 20px 0; border-radius: 40px; color: #931c51; font-weight: bold;"
+          type="tel" readonly ng-click="openKeyboard('tp')" />
+        <div class="input-error-text" ng-show="tpError">{{tpError}}</div>
       </div>
-      <img ng-click="startGame()" style="margin-top: 180px;" src="./png/start_btn.png">
+      <img ng-click="validateAndStart()" style="margin-top: 100px;" src="./png/start_btn.png">
+    </div>
+
+    <!-- QWERTY Keyboard for Name -->
+    <div class="keyboard-overlay" ng-show="activeKeyboard === 'name'" ng-click="closeKeyboard($event)">
+      <div class="keyboard-container" ng-click="$event.stopPropagation()">
+        <div class="keyboard-row">
+          <div class="kb-key" ng-repeat="k in qwertyRow1" ng-click="typeKey(k)">{{shiftActive ? k.toUpperCase() : k}}</div>
+        </div>
+        <div class="keyboard-row">
+          <div class="kb-key" ng-repeat="k in qwertyRow2" ng-click="typeKey(k)">{{shiftActive ? k.toUpperCase() : k}}</div>
+        </div>
+        <div class="keyboard-row">
+          <div class="kb-key kb-shift" ng-class="{'active': shiftActive}" ng-click="toggleShift()">⇧</div>
+          <div class="kb-key" ng-repeat="k in qwertyRow3" ng-click="typeKey(k)">{{shiftActive ? k.toUpperCase() : k}}</div>
+          <div class="kb-key kb-backspace" ng-click="backspaceKey()">⌫</div>
+        </div>
+        <div class="keyboard-row">
+          <div class="kb-key kb-space" ng-click="typeKey(' ')">space</div>
+          <div class="kb-key kb-done" ng-click="doneKey()">Done</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Number Pad for Mobile — single row like reference -->
+    <div class="keyboard-overlay" ng-show="activeKeyboard === 'tp'" ng-click="closeKeyboard($event)">
+      <div class="keyboard-container numpad-container" ng-click="$event.stopPropagation()">
+        <div class="keyboard-row">
+          <div class="kb-key" ng-click="typeKey('1')">1</div>
+          <div class="kb-key" ng-click="typeKey('2')">2</div>
+          <div class="kb-key" ng-click="typeKey('3')">3</div>
+          <div class="kb-key" ng-click="typeKey('4')">4</div>
+          <div class="kb-key" ng-click="typeKey('5')">5</div>
+          <div class="kb-key" ng-click="typeKey('6')">6</div>
+          <div class="kb-key" ng-click="typeKey('7')">7</div>
+          <div class="kb-key" ng-click="typeKey('8')">8</div>
+          <div class="kb-key" ng-click="typeKey('9')">9</div>
+          <div class="kb-key" ng-click="typeKey('0')">0</div>
+          <div class="kb-key kb-backspace" ng-click="backspaceKey()">⌫</div>
+        </div>
+        <div class="keyboard-row numpad-done-row">
+          <div class="kb-key kb-done" ng-click="doneKey()">DONE</div>
+        </div>
+      </div>
     </div>
   </section>
 
