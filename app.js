@@ -1,9 +1,55 @@
 var app = angular.module('FitnessApp', []);
 
-app.controller('MainCtrl', function ($scope, $interval, $timeout) {
+app.controller('MainCtrl', function ($scope, $interval, $timeout, $http) {
     console.log("App Started!");
 
     $scope.page = 1;
+    $scope.playerName = '';
+    $scope.playerTp = '';
+
+    // Disable pinch zoom and double-tap zoom globally for kiosk
+    document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+    document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
+    document.addEventListener('gestureend', function(e) { e.preventDefault(); });
+
+    // Prevent ctrl+wheel zoom and ctrl+plus/minus
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')) {
+            e.preventDefault();
+        }
+    });
+    document.addEventListener('wheel', function(e) {
+        if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+
+    // Smooth page transition helper
+    function goToPage(newPage) {
+        var sections = document.querySelectorAll('section');
+        var currentIndex = $scope.page - 1; // pages are 1-indexed, sections 0-indexed
+        var currentSection = sections[currentIndex];
+
+        if (currentSection) {
+            currentSection.classList.add('page-exit');
+        }
+
+        $timeout(function () {
+            if (currentSection) {
+                currentSection.classList.remove('page-exit');
+            }
+            $scope.page = newPage;
+            // Add enter animation to new section after Angular digest
+            $timeout(function () {
+                var newSection = sections[newPage - 1];
+                if (newSection) {
+                    newSection.classList.add('page-enter');
+                    newSection.addEventListener('animationend', function handler() {
+                        newSection.classList.remove('page-enter');
+                        newSection.removeEventListener('animationend', handler);
+                    });
+                }
+            }, 0);
+        }, 280);
+    }
 
     // Swipe game state
     $scope.timer = 30;
@@ -53,42 +99,74 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
     }
 
     $scope.getPercentage = function() {
-                var pct = ($scope.score / $scope.currentCardIndex) * 100;
-                return Math.min(100, Math.max(0, pct));
-            };
+        var total = $scope.cards.length || 10;
+        var pct = ($scope.score / total) * 100;
+        return Math.min(100, Math.max(0, pct));
+    };
 
-    // Pick 5 random from each category and combine
+    // Pick 6 random from each category and combine
     function generateDeck() {
         var shuffledRazor = shuffle(razorCards);
         var shuffledVeet = shuffle(veetCards);
-        var picked = shuffledRazor.slice(0, 5).concat(shuffledVeet.slice(0, 5));
+        var picked = shuffledRazor.slice(0, 6).concat(shuffledVeet.slice(0, 6));
         return shuffle(picked);
+    }
+
+    // Save game data to PHP/CSV
+    function saveGameData() {
+        $http.post('./save_data.php', {
+            name: $scope.playerName || '',
+            tp: $scope.playerTp || '',
+            score: $scope.score
+        }).then(function(response) {
+            console.log('Data saved:', response.data);
+        }, function(error) {
+            console.error('Save failed:', error);
+        });
     }
 
     // Start the game
     $scope.startGame = function () {
-        $scope.page = 3;
         $scope.timer = 30;
         $scope.score = 0;
         $scope.currentCardIndex = 0;
         $scope.cards = generateDeck();
         $scope.currentCard = $scope.cards[0];
 
-        // Start countdown timer
-        if (timerInterval) $interval.cancel(timerInterval);
-        timerInterval = $interval(function () {
-            $scope.timer--;
-            if ($scope.timer <= 0) {
-                $interval.cancel(timerInterval);
-                timerInterval = null;
-                endGame();
-            }
-        }, 1000);
+        goToPage(3);
 
-        // Setup touch/mouse events after DOM renders
+        // Start countdown timer after page transition completes
         $timeout(function () {
+            if (timerInterval) $interval.cancel(timerInterval);
+            timerInterval = $interval(function () {
+                $scope.timer--;
+
+                // Timer image flash when <=10 seconds
+                if ($scope.timer <= 10) {
+                    var timerImg = document.querySelector('.timer-img');
+                    if (timerImg && !timerImg.classList.contains('timer-img-flash')) {
+                        timerImg.classList.add('timer-img-flash');
+                    }
+                }
+
+                // Timer urgency: pulse red in last 5 seconds
+                if ($scope.timer <= 5) {
+                    var timerEl = document.querySelector('.timer-display');
+                    if (timerEl && !timerEl.classList.contains('timer-urgent')) {
+                        timerEl.classList.add('timer-urgent');
+                    }
+                }
+
+                if ($scope.timer <= 0) {
+                    $interval.cancel(timerInterval);
+                    timerInterval = null;
+                    endGame();
+                }
+            }, 1000);
+
+            // Setup touch/mouse events after DOM renders
             setupSwipeEvents();
-        }, 100);
+        }, 350);
     };
 
     function endGame() {
@@ -96,10 +174,11 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             $interval.cancel(timerInterval);
             timerInterval = null;
         }
-        if ($scope.score >= 8) {
-            $scope.page = 4; // Win
+        saveGameData();
+        if ($scope.score >= 10) {
+            goToPage(4); // Win
         } else {
-            $scope.page = 5; // Lose
+            goToPage(5); // Lose
         }
     }
 
@@ -128,24 +207,29 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
             isCorrect = true;
         }
 
-        var borderEl = document.querySelector('.correct-sel-border');
         if (isCorrect) {
             $scope.score++;
-            if (borderEl) {
-                borderEl.classList.remove('fade-out');
-                borderEl.classList.add('correct-answer');
+            card.classList.add('correct-answer');
+            // Score pop animation
+            var scoreEl = document.querySelector('.score-display');
+            if (scoreEl) {
+                scoreEl.classList.remove('score-pop');
+                void scoreEl.offsetWidth;
+                scoreEl.classList.add('score-pop');
             }
+            // Heart pop on progress bar
+            var heartEl = document.querySelector('.game-area .heart-marker');
+            if (heartEl) {
+                heartEl.classList.remove('heart-pop');
+                void heartEl.offsetWidth;
+                heartEl.classList.add('heart-pop');
+            }
+        } else {
+            card.classList.add('wrong-answer');
         }
 
         // Wait for animation to complete, then show next card
         $timeout(function () {
-            if (borderEl && isCorrect) {
-                borderEl.classList.remove('correct-answer');
-                borderEl.classList.add('fade-out');
-                $timeout(function () {
-                    if (borderEl) borderEl.classList.remove('fade-out');
-                }, 500);
-            }
             $scope.currentCardIndex++;
             if ($scope.currentCardIndex < $scope.cards.length) {
                 $scope.currentCard = $scope.cards[$scope.currentCardIndex];
@@ -179,29 +263,37 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
         if (!card) return;
 
         // Reset classes and styles
-        card.classList.remove('animating', 'swipe-left', 'swipe-right');
-        card.style.transform = 'translate(-50%, -50%)';
-        card.style.opacity = '1';
+        card.classList.remove('animating', 'swipe-left', 'swipe-right', 'correct-answer', 'wrong-answer');
+        card.style.transform = '';
+        card.style.opacity = '';
 
-        // Touch events
-        card.ontouchstart = function (e) {
+        // Card entrance animation
+        card.classList.add('card-enter');
+        card.addEventListener('animationend', function handler() {
+            card.classList.remove('card-enter');
+            card.style.transform = 'translate(-50%, -50%)';
+            card.style.opacity = '1';
+            card.removeEventListener('animationend', handler);
+        });
+
+        // Unified drag start/move/end handlers
+        function onDragStart(x) {
             isDragging = true;
-            startX = e.touches[0].clientX;
-            currentX = startX;
+            startX = x;
+            currentX = x;
             card.style.transition = 'none';
-        };
+        }
 
-        card.ontouchmove = function (e) {
+        function onDragMove(x) {
             if (!isDragging) return;
-            e.preventDefault();
-            currentX = e.touches[0].clientX;
+            currentX = x;
             var deltaX = currentX - startX;
             var styles = getDragTransform(deltaX);
             card.style.transform = styles.transform;
             card.style.opacity = styles.opacity;
-        };
+        }
 
-        card.ontouchend = function (e) {
+        function onDragEnd() {
             if (!isDragging) return;
             isDragging = false;
             var deltaX = currentX - startX;
@@ -216,45 +308,53 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout) {
                 card.style.transform = 'translate(-50%, -50%)';
                 card.style.opacity = '1';
             }
-        };
+        }
 
-        // Mouse events for desktop
-        card.onmousedown = function (e) {
-            isDragging = true;
-            startX = e.clientX;
-            currentX = e.clientX;
-            card.style.transition = 'none';
-            e.preventDefault();
-        };
+        // Pointer Events (Windows touch kiosk + modern browsers)
+        if (window.PointerEvent) {
+            card.style.touchAction = 'none';
+            card.onpointerdown = function (e) {
+                card.setPointerCapture(e.pointerId);
+                onDragStart(e.clientX);
+                e.preventDefault();
+            };
+            card.onpointermove = function (e) {
+                onDragMove(e.clientX);
+            };
+            card.onpointerup = function (e) {
+                onDragEnd();
+            };
+            card.onpointercancel = function (e) {
+                onDragEnd();
+            };
+        } else {
+            // Touch events (Android / iOS fallback)
+            card.ontouchstart = function (e) {
+                onDragStart(e.touches[0].clientX);
+            };
+            card.ontouchmove = function (e) {
+                e.preventDefault();
+                onDragMove(e.touches[0].clientX);
+            };
+            card.ontouchend = function () {
+                onDragEnd();
+            };
 
-        document.onmousemove = function (e) {
-            if (!isDragging) return;
-            currentX = e.clientX;
-            var deltaX = currentX - startX;
-            var styles = getDragTransform(deltaX);
-            card.style.transform = styles.transform;
-            card.style.opacity = styles.opacity;
-        };
-
-        document.onmouseup = function (e) {
-            if (!isDragging) return;
-            isDragging = false;
-            var deltaX = currentX - startX;
-            if (Math.abs(deltaX) > 80) {
-                var direction = deltaX < 0 ? 'left' : 'right';
-                $scope.$apply(function () {
-                    animateSwipe(direction);
-                });
-            } else {
-                // Snap back with spring feel
-                card.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease';
-                card.style.transform = 'translate(-50%, -50%)';
-                card.style.opacity = '1';
-            }
-        };
+            // Mouse events (desktop fallback)
+            card.onmousedown = function (e) {
+                onDragStart(e.clientX);
+                e.preventDefault();
+            };
+            document.onmousemove = function (e) {
+                onDragMove(e.clientX);
+            };
+            document.onmouseup = function () {
+                onDragEnd();
+            };
+        }
     }
 
     $scope.pg_up = function () {
-        $scope.page++;
+        goToPage($scope.page + 1);
     };
 });
