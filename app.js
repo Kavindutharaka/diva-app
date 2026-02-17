@@ -7,6 +7,10 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout, $http) {
     $scope.playerName = '';
     $scope.playerTp = '';
 
+    $scope.go_home = function(){
+        window.location.href = "./video.html";
+    };
+
     // ===== CUSTOM ON-SCREEN KEYBOARD =====
     $scope.activeKeyboard = null; // 'name' or 'tp' or null
     $scope.shiftActive = true; // Start with shift on for first letter capitalization
@@ -282,6 +286,7 @@ app.controller('MainCtrl', function ($scope, $interval, $timeout, $http) {
         } else {
             goToPage(5); // Lose
         }
+        $timeout(function(){window.location.reload();},6000);
     }
 
     // Swipe card programmatically (from button clicks)

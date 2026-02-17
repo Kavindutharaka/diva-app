@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="FitnessApp" ng-cloak style="touch-action: manipulation; -ms-touch-action: manipulation; -ms-content-zooming: none;">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>App</title>
+  <link rel="icon" type="image/x-icon" href="ico.ico">
+
+  <script src="./sup/angular.min.js"></script>
+  <script src="./app.js"></script>
+    <style>
+        .body{
+            margin: 0;
+        }
+    </style>
+  <link rel="stylesheet" href="./sup/styles.css">
+</head>
+
+<body ng-controller="MainCtrl" style="background: url(./png/bg.png); touch-action: manipulation; width: 1080px; height: 1920px;" oncontextmenu="return false;">
+
+  <section ng-show="page == 1" style="position: relative; width: 1080px; height: 1920px;">
+    <video id="myVideo" loop muted autoplay playsinline
+       src="./VEET Pure Sinhala_Vertical_9x16.mp4"
+       style="width:1080px; height:1920px; object-fit:cover;">
+</video>
+<div ng-click="go_home()" style="position: absolute; left: 0; top:0; width:300px; height: 300px; background-color: transparent;"></div>
+  </section>
+  <script>
+    var app = angular.module('FitnessApp', []);
+
+app.controller('MainCtrl', function ($scope, $interval, $timeout, $http) {
+    console.log("App Started!");
+    $scope.page = 1;
+    $scope.go_home = function(){
+        window.location.href = "./index.html";
+    };
+});
+  </script>
+
+</body>
+
+</html>
